@@ -43,6 +43,7 @@ pipeline {
                         --severity HIGH,CRITICAL \
                         --no-progress \
                         --scanners vuln \
+                        --skip-db-update \
                         .
                 '''
             }
@@ -70,6 +71,7 @@ pipeline {
                         --severity HIGH,CRITICAL \
                         --no-progress \
                         --scanners vuln \
+                        --skip-db-update \
                         bytesapp:${IMAGE_TAG}
                 """
             }
