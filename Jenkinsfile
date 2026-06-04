@@ -42,6 +42,7 @@ pipeline {
                         --exit-code 0 \
                         --severity HIGH,CRITICAL \
                         --no-progress \
+                        --scanners vuln \
                         .
                 '''
             }
@@ -68,6 +69,7 @@ pipeline {
                         --exit-code 0 \
                         --severity HIGH,CRITICAL \
                         --no-progress \
+                        --scanners vuln \
                         bytesapp:${IMAGE_TAG}
                 """
             }
