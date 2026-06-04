@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -7,20 +6,19 @@ pipeline {
     }
 
     environment {
-        AWS_REGION     = 'ap-south-1'
-        ECR_REPO       = '322236400881.dkr.ecr.ap-south-1.amazonaws.com/bytesapp'
-        IMAGE_TAG      = "${env.BUILD_NUMBER}"
-        EC2_INSTANCE   = credentials('ec2-instance-id')
+        AWS_REGION   = 'ap-south-1'
+        ECR_REPO     = '322236400881.dkr.ecr.ap-south-1.amazonaws.com/bytesapp'
+        IMAGE_TAG    = "${env.BUILD_NUMBER}"
+        EC2_INSTANCE = credentials('ec2-instance-id')
     }
 
     stages {
 
-       stage('Checkout') {
+        stage('Checkout') {
             steps {
-                cleanWs()      
+                cleanWs()
                 checkout scm
-                }
-}
+            }
         }
 
         stage('Install Dependencies') {
