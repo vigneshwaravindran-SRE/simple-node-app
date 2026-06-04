@@ -36,6 +36,29 @@ pipeline {
             }
         }
 
+        stage('Vulnerability Scan') {
+    steps {
+        sh '''
+            # Install Trivy if not present
+            if ! command -v trivy &> /dev/null; then
+                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+            fi
+
+            # Scan filesystem for dependency vulnerabilities
+            trivy fs \
+                --exit-code 0 \
+                --severity HIGH,CRITICAL \
+                --no-progress \
+                .
+        '''
+    }
+    post {
+        always {
+            echo 'Vulnerability scan complete'
+        }
+    }
+}
+
         stage('Build Docker Image') {
             steps {
                 sh """
