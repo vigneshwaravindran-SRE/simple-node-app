@@ -2,5 +2,13 @@
   "name": "simple-node-app",
   "version": "1.0.0",
   "main": "index.js",
-  "dependencies": {}
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --forceExit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "supertest": "^6.3.0"
+  }
 }
