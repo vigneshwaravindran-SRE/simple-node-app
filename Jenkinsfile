@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -14,10 +15,12 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+       stage('Checkout') {
             steps {
+                cleanWs()      
                 checkout scm
-            }
+                }
+}
         }
 
         stage('Install Dependencies') {
