@@ -58,6 +58,17 @@ pipeline {
         }
     }
 }
+        stage('Scan Docker Image') {
+    steps {
+        sh """
+            trivy image \
+                --exit-code 0 \
+                --severity HIGH,CRITICAL \
+                --no-progress \
+                bytesapp:${IMAGE_TAG}
+        """
+    }
+}
 
         stage('Build Docker Image') {
             steps {
