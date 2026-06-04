@@ -1,13 +1,16 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'nodejs'    // ← add this block
+    }
+
     environment {
         AWS_REGION     = 'ap-south-1'
         ECR_REPO       = '322236400881.dkr.ecr.ap-south-1.amazonaws.com/bytesapp'
         IMAGE_TAG      = "${env.BUILD_NUMBER}"
         EC2_INSTANCE   = credentials('ec2-instance-id')
     }
-
     stages {
 
         stage('Checkout') {
