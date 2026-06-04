@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'nodejs'    // ← add this block
+        nodejs 'nodejs'
     }
 
     environment {
@@ -11,6 +11,7 @@ pipeline {
         IMAGE_TAG      = "${env.BUILD_NUMBER}"
         EC2_INSTANCE   = credentials('ec2-instance-id')
     }
+
     stages {
 
         stage('Checkout') {
@@ -36,39 +37,25 @@ pipeline {
             }
         }
 
-        stage('Vulnerability Scan') {
-    steps {
-        sh '''
-            # Install Trivy if not present
-            if ! command -v trivy &> /dev/null; then
-                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-            fi
-
-            # Scan filesystem for dependency vulnerabilities
-            trivy fs \
-                --exit-code 0 \
-                --severity HIGH,CRITICAL \
-                --no-progress \
-                .
-        '''
-    }
-    post {
-        always {
-            echo 'Vulnerability scan complete'
+        stage('Vulnerability Scan - Dependencies') {
+            steps {
+                sh '''
+                    if ! command -v trivy &> /dev/null; then
+                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                    fi
+                    trivy fs \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --no-progress \
+                        .
+                '''
+            }
+            post {
+                always {
+                    echo 'Dependency vulnerability scan complete'
+                }
+            }
         }
-    }
-}
-        stage('Scan Docker Image') {
-    steps {
-        sh """
-            trivy image \
-                --exit-code 0 \
-                --severity HIGH,CRITICAL \
-                --no-progress \
-                bytesapp:${IMAGE_TAG}
-        """
-    }
-}
 
         stage('Build Docker Image') {
             steps {
@@ -80,12 +67,29 @@ pipeline {
             }
         }
 
+        stage('Vulnerability Scan - Container') {
+            steps {
+                sh """
+                    trivy image \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --no-progress \
+                        bytesapp:${IMAGE_TAG}
+                """
+            }
+            post {
+                always {
+                    echo 'Container vulnerability scan complete'
+                }
+            }
+        }
+
         stage('Push to ECR') {
             steps {
                 sh """
                     aws ecr get-login-password --region ${AWS_REGION} | \
                     docker login --username AWS --password-stdin ${ECR_REPO}
-                    
+
                     docker push ${ECR_REPO}:${IMAGE_TAG}
                     docker push ${ECR_REPO}:latest
                 """
